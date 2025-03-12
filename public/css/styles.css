@@ -15,14 +15,15 @@ body {
 }
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 nav {
-  background-color: black;  
+  background-color: rgb(91, 91, 91);  
   display: flex;
   justify-content: center;  
   padding: 3vw;  
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 nav ul {
@@ -41,13 +42,13 @@ nav ul li {
 }
 
 nav ul li:hover {
-  color: #0095ff; 
+  color: #000305; 
 }
 
 .motors {
   font-size: 7vw;
   text-decoration: none;
-  color: black;
+  color: rgb(0, 0, 0);
 }
 
 .account {
@@ -74,7 +75,7 @@ nav ul li:hover {
   background-color: rgba(255, 255, 255, 0.8);
   text-align: center;
   padding: 1vw;
-  color: #0095ff;
+  color: #009dae;
   font-size: 2vw;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -82,18 +83,19 @@ nav ul li:hover {
 .own {
   text-decoration: none;
   padding: 0.8vw;
-  background-color: #0061a6;
+  background-color: #009dae;
   color: white;
   border-radius: 0.4vw;
 }
 
 .own:hover {
   background-color: white;
-  color: #0095ff;
+  color: #009dae;
 }
 
 .reviews {
   font-size: 4vw;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .upgrades {
@@ -103,6 +105,7 @@ nav ul li:hover {
   gap: 5vw;
   font-size: 4vw;
   margin-bottom: 15vw;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .up1 {
@@ -117,7 +120,7 @@ nav ul li:hover {
 
 .up1 img {
   grid-row: 1;
-  background-color: #0095ff;
+  background-color: #009dae;
   padding: 2vw;
   width: 30vw;
   height: 30vw;
@@ -141,7 +144,7 @@ nav ul li:hover {
 
 .up2 img {
   grid-row: 1;
-  background-color: #0095ff;
+  background-color: #009dae;
   padding: 2vw;
   width: 30vw;
   height: 30vw;
@@ -165,7 +168,7 @@ nav ul li:hover {
 
 .up3 img {
   grid-row: 1;
-  background-color: #0095ff;
+  background-color: #009dae;
   padding: 2vw;
   width: 30vw;
   height: 30vw;
@@ -189,7 +192,7 @@ nav ul li:hover {
 
 .up4 img {
   grid-row: 1;
-  background-color: #0095ff;
+  background-color: #009dae;
   padding: 2vw;
   width: 30vw;
   height: 30vw;
@@ -236,7 +239,7 @@ header {
       }
 
       body {
-        border: 0.4vw solid #0095ff;
+        border: 0.4vw solid #009dae;
       }
 
       .grid_large_view {
