@@ -232,8 +232,89 @@ header {
   padding: 1rem 1rem;
 }
 
+#inv-display {
+  display: flex;
+  flex-wrap: wrap; 
+  justify-content: center; 
+  padding: 0; 
+  list-style-type: none; 
+  margin: 0; 
+}
+
+#inv-display li {
+  width: 18rem; 
+  margin: 1rem; 
+  border: 1px solid #ddd; 
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  overflow: hidden; 
+  background-color: #fefefe; 
+}
+
+#inv-display li img {
+  width: 18rem;
+  height: 12rem;
+  display: block;
+}
+
+.namePrice {
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.namePrice h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.namePrice span {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #000000;
+  display: block;
+  margin-top: 1rem;
+}
+
+.vehicle-details {
+  text-align: center;
+  display: flex;
+  flex-direction: column;  /* Por defecto en dispositivos móviles, imagen arriba */
+  align-items: center;
+  padding: 3rem;
+}
+
+.vehicle-image img {
+  max-width: 100%;  /* Para que la imagen sea responsiva */
+  height: auto;
+}
+
+.vehicle-info {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+
+
 @media screen and (min-width: 800px)
     {
+      .vehicle-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Two equal columns */
+        align-items: center; /* Vertically align content */
+        gap: 2rem; /* Add space between the image and the text */
+      }
+    
+      .vehicle-details img {
+        grid-column: 1; /* Place the image in the first column */
+        justify-self: center; /* Center the image horizontally */
+        max-width: 100%; /* Ensure the image is responsive */
+      }
+    
+      .vehicle-details .vehicle-info {
+        grid-column: 2; /* Place the car information in the second column */
+        text-align: left; /* Align text to the left */
+      }
+
       html {
         background-image: url('../images/site/small_check.jpg');
       }

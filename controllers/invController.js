@@ -19,5 +19,18 @@ invCont.buildByClassificationId = async function (req, res, next) {
   })
 }
 
-
+invCont.buildByInventoryId = async function (req, res, next) {
+  const inv_id = req.params.invId
+  const data = await invModel.getInventoryById(inv_id)
+  let nav = await utilities.getNav()
+  if (data) {
+      res.render("./inventory/details", {
+          title: `${data.inv_make} ${data.inv_model}`,
+          nav,
+          vehicle: data,
+      })
+  } else {
+      res.status(404).render("404", { title: "Vehicle Not Found", nav })
+  }
+}
 module.exports = invCont
