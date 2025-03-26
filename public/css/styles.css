@@ -283,6 +283,10 @@ header {
   padding: 3rem;
 }
 
+.vehicle-details img {
+    width: 25rem;
+}
+
 .vehicle-image img {
   max-width: 100%;  /* Para que la imagen sea responsiva */
   height: auto;
