@@ -296,9 +296,27 @@ header {
   margin-top: 3rem;
 }
 
+.trigger-button, .return {
+  font-size: .7rem;
+  text-decoration: none;
+  background-color: #009dae;
+  padding: .25rem;
+  color: #ddd;
+  border-radius: .4rem;
+  margin: 1rem;
+}
+
+footer {
+  margin-top: 4rem;
+}
+
+.return-box {
+  text-align: center;
+}
 
 
 @media screen and (min-width: 800px)
+
     {
       .vehicle-details {
         display: grid;

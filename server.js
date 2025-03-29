@@ -12,6 +12,8 @@ const app = express()
 const static = require("./routes/static")
 const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute")
+const errorHandler = require("./middleware/errorMiddleware") // Import error middleware
+const errorRoute = require("./routes/errorRoute") // Import error route
 
 /* ***********************
  * View Engine and Templates
@@ -27,6 +29,22 @@ app.use(require("./routes/static"))
 app.get("/", baseController.buildHome)
 // Inventory routes
 app.use("/inv", inventoryRoute)
+// Error route
+app.use("/", errorRoute) // Add the intentional error route
+
+/* ***********************
+ * Middleware for 404 Errors
+ *************************/
+app.use((req, res, next) => {
+  const error = new Error("Page Not Found")
+  error.status = 404
+  next(error) // Pass the error to the error-handling middleware
+})
+
+/* ***********************
+ * Error-Handling Middleware
+ *************************/
+app.use(errorHandler) // Use the error-handling middleware
 
 /* ***********************
  * Local Server Information
