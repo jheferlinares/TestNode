@@ -337,7 +337,7 @@ footer {
   border: 1px solid #f5c6cb;
 }
 
-.login-form {
+.login-form, .register-form {
   display: flex; /* Activa el modelo de caja flexible */
   justify-content: center; /* Centra horizontalmente */
   align-items: center; /* Centra verticalmente */
@@ -390,6 +390,29 @@ form button:hover {
   background-color: #001e21;
 }
 
+.password-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.password-container input {
+  flex: 1;
+}
+
+.password-container button {
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  background-color: #028b9b;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.password-container button:hover {
+  background-color: #00555e;
+}
 
 @media screen and (min-width: 800px)
 
