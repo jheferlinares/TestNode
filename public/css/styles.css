@@ -348,13 +348,18 @@ footer {
 form {
   color: #000000;
   width: 100%;
-  max-width: 30rem; /* Ancho máximo del formulario */
-  padding: 2rem;
+  max-width: 20rem; /* Ancho máximo del formulario */
+  padding: 1rem;
   background-color: #cef9fd;
   border-radius: .5rem;
   display: flex;
   flex-direction: column; /* Asegura que los elementos estén en columna */
-  gap: 1.5rem; /* Espaciado entre los elementos */
+  gap: .5rem; /* Espaciado entre los elementos */
+}
+
+.span-password {
+  font-size: 0.5rem;
+  color: #000000;
 }
 
 form label {
@@ -364,7 +369,7 @@ form label {
 
 form input {
   padding: 0.5rem;
-  font-size: 1rem;
+  font-size: .5rem;
   border: none; /* Elimina el borde predeterminado */
   border-bottom: .1rem solid #ffffff; /* Línea debajo del campo */
   background-color: transparent; /* Fondo transparente */
@@ -398,6 +403,10 @@ form button:hover {
 
 .password-container input {
   flex: 1;
+}
+
+#togglePassword{
+  font-size: .8rem;
 }
 
 .password-container button {

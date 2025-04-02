@@ -32,6 +32,7 @@ app.use(session({
   name: 'sessionId',
 }))
 
+// Middleware to parse form data
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 

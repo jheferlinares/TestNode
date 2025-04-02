@@ -40,6 +40,7 @@ const buildRegister = async (req, res, next) => {
     res.render("account/register", {
       title: "Register",
       nav,
+      errors: null,
     });
   } catch (error) {
     next(error); // Pass the error to the error-handling middleware
@@ -47,45 +48,37 @@ const buildRegister = async (req, res, next) => {
 };
 
 /* ****************************************
- *  Process Registration
- **************************************** */
-const registerAccount = async (req, res, next) => {
-  try {
-    const nav = await utilities.getNav(); // Get navigation
-    const { account_firstname, account_lastname, account_email, account_password } = req.body;
+*  Process Registration
+* *************************************** */
+async function registerAccount(req, res) {
+  let nav = await utilities.getNav()
+  const { account_firstname, account_lastname, account_email, account_password } = req.body
 
-    console.log("Form Data Received:", req.body); // Debugging log
+  const regResult = await accountModel.registerAccount(
+    account_firstname,
+    account_lastname,
+    account_email,
+    account_password
+  )
 
-    // Call the model function to register the account
-    const regResult = await accountModel.registerAccount(
-      account_firstname,
-      account_lastname,
-      account_email,
-      account_password
-    );
-
-    console.log("Database Result:", regResult); // Debugging log
-
-    if (regResult.rowCount) {
-      req.flash(
-        "notice",
-        `Congratulations, you're registered ${account_firstname}. Please log in.`
-      );
-      res.status(201).render("account/login", {
-        title: "Login",
-        nav,
-      });
-    } else {
-      req.flash("notice", "Sorry, the registration failed.");
-      res.status(501).render("account/register", {
-        title: "Registration",
-        nav,
-      });
-    }
-  } catch (error) {
-    console.error("Error in registerAccount:", error); // Debugging log
-    next(error); // Pass the error to the error-handling middleware
+  if (regResult) {
+    req.flash(
+      "notice",
+      `Congratulations, you\'re registered ${account_firstname}. Please log in.`
+    )
+    res.status(201).render("account/login", {
+      title: "Login",
+      nav,
+    })
+  } else {
+    req.flash("notice", "Sorry, the registration failed.")
+    res.status(501).render("account/register", {
+      title: "Registration",
+      nav,
+    })
   }
-};
+}
+
+
 
 module.exports = { buildLogin, buildAccountPage, buildRegister, registerAccount };
