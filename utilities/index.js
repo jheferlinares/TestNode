@@ -7,33 +7,27 @@ const pool = new Pool({
 });
 
 const invModel = require("../models/inventory-model");
-const utilities = {}; // Initialize the utilities object
+const utilities = {}; // Inicializa el objeto utilities
 
 /* ************************
  * Constructs the nav HTML unordered list
  ************************ */
 utilities.getNav = async function () {
   try {
-    const data = await invModel.getClassifications();
+    const data = await invModel.getClassifications(); // Obtiene las clasificaciones desde la base de datos
     let list = "<ul>";
     list += '<li><a href="/" title="Home page">Home</a></li>';
     data.rows.forEach((row) => {
       list += "<li>";
       list +=
-        '<a href="/inv/type/' +
-        row.classification_id +
-        '" title="See our inventory of ' +
-        row.classification_name +
-        ' vehicles">' +
-        row.classification_name +
-        "</a>";
+        `<a href="/inv/type/${row.classification_id}" title="See our inventory of ${row.classification_name} vehicles">${row.classification_name}</a>`;
       list += "</li>";
     });
     list += "</ul>";
-    return list;
+    return list; // Devuelve el HTML generado
   } catch (error) {
-    console.error("Error in getNav:", error.message); // Debugging log
-    throw error; // Re-throw the error to be handled by the caller
+    console.error("Error in getNav:", error.message); // Log para depuración
+    throw error; // Lanza el error para que sea manejado por el controlador
   }
 };
 
@@ -48,39 +42,17 @@ utilities.buildClassificationGrid = async function (data) {
       data.forEach((vehicle) => {
         grid += "<li>";
         grid +=
-          '<a href="/inv/detail/' +
-          vehicle.inv_id +
-          '" title="View ' +
-          vehicle.inv_make +
-          " " +
-          vehicle.inv_model +
-          ' details"><img src="' +
-          vehicle.inv_thumbnail +
-          '" alt="Image of ' +
-          vehicle.inv_make +
-          " " +
-          vehicle.inv_model +
-          ' on CSE Motors" /></a>';
+          `<a href="/inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
+            <img src="${vehicle.inv_thumbnail}" alt="Image of ${vehicle.inv_make} ${vehicle.inv_model} on CSE Motors" />
+          </a>`;
         grid += '<div class="namePrice">';
         grid += "<hr />";
-        grid += "<h2>";
-        grid +=
-          '<a href="/inv/detail/' +
-          vehicle.inv_id +
-          '" title="View ' +
-          vehicle.inv_make +
-          " " +
-          vehicle.inv_model +
-          ' details">' +
-          vehicle.inv_make +
-          " " +
-          vehicle.inv_model +
-          "</a>";
-        grid += "</h2>";
-        grid +=
-          "<span>$" +
-          new Intl.NumberFormat("en-US").format(vehicle.inv_price) +
-          "</span>";
+        grid += `<h2>
+            <a href="/inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
+              ${vehicle.inv_make} ${vehicle.inv_model}
+            </a>
+          </h2>`;
+        grid += `<span>$${new Intl.NumberFormat("en-US").format(vehicle.inv_price)}</span>`;
         grid += "</div>";
         grid += "</li>";
       });
@@ -88,10 +60,29 @@ utilities.buildClassificationGrid = async function (data) {
     } else {
       grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>';
     }
-    return grid;
+    return grid; // Devuelve el HTML generado
   } catch (error) {
-    console.error("Error in buildClassificationGrid:", error.message); // Debugging log
-    throw error; // Re-throw the error to be handled by the caller
+    console.error("Error in buildClassificationGrid:", error.message); // Log para depuración
+    throw error; // Lanza el error para que sea manejado por el controlador
+  }
+};
+
+/* **************************************
+ * Build the classification dropdown list
+ ************************************** */
+utilities.buildClassificationList = async function () {
+  try {
+    const data = await invModel.getClassifications(); // Obtén las clasificaciones desde la base de datos
+    let classificationList = '<select name="classification_id" id="classificationList" required>';
+    classificationList += "<option value=''>Choose a Classification</option>";
+    data.rows.forEach((row) => {
+      classificationList += `<option value="${row.classification_id}">${row.classification_name}</option>`;
+    });
+    classificationList += "</select>";
+    return classificationList; // Devuelve el HTML generado
+  } catch (error) {
+    console.error("Error building classification list:", error.message); // Log para depuración
+    throw error; // Lanza el error para que sea manejado por el controlador
   }
 };
 
@@ -101,12 +92,12 @@ utilities.buildClassificationGrid = async function (data) {
 utilities.errorHandler = (callback) => {
   return async (req, res, next) => {
     try {
-      await callback(req, res, next); // Execute the callback function
+      await callback(req, res, next); // Ejecuta la función callback
     } catch (err) {
-      console.error("Error in errorHandler:", err.message); // Debugging log
-      next(err); // Pass the error to the error-handling middleware
+      console.error("Error in errorHandler:", err.message); // Log para depuración
+      next(err); // Pasa el error al middleware de manejo de errores
     }
   };
 };
 
-module.exports = utilities; // Export the utilities object
+module.exports = utilities; // Exporta el objeto utilities

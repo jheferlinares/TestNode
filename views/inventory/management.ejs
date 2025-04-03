@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Inventory Management</h1>
+  </header>
+  <main>
+    <% if (messages && Object.keys(messages).length > 0) { %>
+      <div class="flash-messages">
+        <% Object.keys(messages).forEach(function (type) { %>
+          <% messages[type].forEach(function (message) { %>
+            <div class="flash-message <%= type %>"><%= message %></div>
+          <% }) %>
+        <% }) %>
+      </div>
+    <% } %>
+    <ul>
+      <li><a href="/inv/add-classification">Add New Classification</a></li>
+      <li><a href="/inv/add-inventory">Add New Inventory Item</a></li>
+    </ul>
+  </main>
+</body>
+</html>

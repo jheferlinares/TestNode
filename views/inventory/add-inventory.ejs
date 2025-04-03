@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Inventory</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Add New Inventory Item</h1>
+  </header>
+  <main>
+    <!-- Mensajes Flash -->
+    <% if (messages && Object.keys(messages).length > 0) { %>
+      <div class="flash-messages">
+        <% Object.keys(messages).forEach(function (type) { %>
+          <% messages[type].forEach(function (message) { %>
+            <div class="flash-message <%= type %>"><%= message %></div>
+          <% }) %>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Errores de Validación -->
+    <% if (errors && errors.array().length > 0) { %>
+      <ul class="notice">
+        <% errors.array().forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <!-- Formulario para Agregar Inventario -->
+    <form action="/inv/add-inventory" method="POST">
+        <label for="classification_id">Classification:</label>
+        <%- classificationList %>
+      
+        <label for="inv_make">Make:</label>
+        <input type="text" id="inv_make" name="inv_make" value="<%= typeof inv_make !== 'undefined' ? inv_make : '' %>" required>
+      
+        <label for="inv_model">Model:</label>
+        <input type="text" id="inv_model" name="inv_model" value="<%= typeof inv_model !== 'undefined' ? inv_model : '' %>" required>
+      
+        <label for="inv_year">Year:</label>
+        <input type="text" id="inv_year" name="inv_year" value="<%= typeof inv_year !== 'undefined' ? inv_year : '' %>" required>
+      
+        <label for="inv_description">Description:</label>
+        <textarea id="inv_description" name="inv_description" required><%= typeof inv_description !== 'undefined' ? inv_description : '' %></textarea>
+      
+        <label for="inv_image">Image URL:</label>
+        <input type="text" id="inv_image" name="inv_image" value="<%= typeof inv_image !== 'undefined' ? inv_image : '' %>" required>
+      
+        <label for="inv_thumbnail">Thumbnail URL:</label>
+        <input type="text" id="inv_thumbnail" name="inv_thumbnail" value="<%= typeof inv_thumbnail !== 'undefined' ? inv_thumbnail : '' %>" required>
+      
+        <label for="inv_price">Price:</label>
+        <input type="number" id="inv_price" name="inv_price" value="<%= typeof inv_price !== 'undefined' ? inv_price : '' %>" required>
+      
+        <label for="inv_miles">Miles:</label>
+        <input type="number" id="inv_miles" name="inv_miles" value="<%= typeof inv_miles !== 'undefined' ? inv_miles : '' %>" required>
+      
+        <label for="inv_color">Color:</label>
+        <input type="text" id="inv_color" name="inv_color" value="<%= typeof inv_color !== 'undefined' ? inv_color : '' %>" required>
+      
+        <button type="submit">Add Vehicle</button>
+      </form>
+  </main>
+</body>
+</html>
