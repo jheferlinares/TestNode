@@ -160,7 +160,7 @@ const buildManagement = async (req, res, next) => {
       nav,
     });
   } catch (error) {
-    next(error); ¿
+    next(error); 
   }
 };
 
