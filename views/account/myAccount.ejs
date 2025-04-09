@@ -4,14 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+  <header>
+    <h1>My Account</h1>
+  </header>
   <main>
-    <h1><%= title %></h1>
-    <p>Welcome to your account page!</p>
+    <p>You are now logged in.</p>
+    <ul>
+      <li><a href="/account/login">Logout</a></li>
+    </ul>
   </main>
-  <footer>
-    <p>&copy; <%= new Date().getFullYear() %> CSE 340 App</p>
-  </footer>
 </body>
 </html>

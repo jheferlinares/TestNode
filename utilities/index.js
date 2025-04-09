@@ -1,4 +1,8 @@
 const { Pool } = require("pg");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const Util = {}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -19,8 +23,7 @@ utilities.getNav = async function () {
     list += '<li><a href="/" title="Home page">Home</a></li>';
     data.rows.forEach((row) => {
       list += "<li>";
-      list +=
-        `<a href="/inv/type/${row.classification_id}" title="See our inventory of ${row.classification_name} vehicles">${row.classification_name}</a>`;
+      list += `<a href="/inv/type/${row.classification_id}" title="See our inventory of ${row.classification_name} vehicles">${row.classification_name}</a>`;
       list += "</li>";
     });
     list += "</ul>";
@@ -41,17 +44,16 @@ utilities.buildClassificationGrid = async function (data) {
       grid = '<ul id="inv-display">';
       data.forEach((vehicle) => {
         grid += "<li>";
-        grid +=
-          `<a href="/inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
-            <img src="${vehicle.inv_thumbnail}" alt="Image of ${vehicle.inv_make} ${vehicle.inv_model} on CSE Motors" />
-          </a>`;
+        grid += `<a href="/inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
+                  <img src="${vehicle.inv_thumbnail}" alt="Image of ${vehicle.inv_make} ${vehicle.inv_model} on CSE Motors" />
+                </a>`;
         grid += '<div class="namePrice">';
         grid += "<hr />";
         grid += `<h2>
-            <a href="/inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
-              ${vehicle.inv_make} ${vehicle.inv_model}
-            </a>
-          </h2>`;
+                  <a href="/inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
+                    ${vehicle.inv_make} ${vehicle.inv_model}
+                  </a>
+                </h2>`;
         grid += `<span>$${new Intl.NumberFormat("en-US").format(vehicle.inv_price)}</span>`;
         grid += "</div>";
         grid += "</li>";
@@ -100,4 +102,42 @@ utilities.errorHandler = (callback) => {
   };
 };
 
-module.exports = utilities; // Exporta el objeto utilities
+/* ****************************************
+ * Middleware to check token validity
+ **************************************** */
+/* ****************************************
+* Middleware to check token validity
+**************************************** */
+utilities.checkJWTToken = (req, res, next) => {
+  if (req.cookies.jwt) {
+   jwt.verify(
+    req.cookies.jwt,
+    process.env.ACCESS_TOKEN_SECRET,
+    function (err, accountData) {
+     if (err) {
+      req.flash("Please log in")
+      res.clearCookie("jwt")
+      return res.redirect("/account/login")
+     }
+     res.locals.accountData = accountData
+     res.locals.loggedin = 1
+     next()
+    })
+  } else {
+   next()
+  }
+ }
+
+ /* ****************************************
+ *  Check Login
+ * ************************************ */
+ Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next()
+  } else {
+    req.flash("notice", "Please log in.")
+    return res.redirect("/account/login")
+  }
+ }
+
+module.exports = utilities, Util; // Exporta el objeto utilities
