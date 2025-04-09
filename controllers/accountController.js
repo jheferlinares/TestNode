@@ -216,18 +216,6 @@ function updateAccountInfo(req, res) {
     });
 }
 
-function updatePassword(req, res) {
-  const { newPassword } = req.body;
-  const accountId = req.user.account_id;
-
-  accountModel.updatePassword(accountId, newPassword)
-    .then(updatedAccount => {
-      res.redirect('/account/management'); 
-    })
-    .catch(err => {
-      res.status(500).send('Error');
-    });
-}
 
 
 
