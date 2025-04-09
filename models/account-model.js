@@ -42,5 +42,37 @@ async function getAccountByEmail (account_email) {
   }
 }
 
-module.exports = { registerAccount, checkExistingEmail, getAccountByEmail };
+
+async function updateAccountInfo(accountId, firstName, lastName, email) {
+  const sql = 'UPDATE accounts SET first_name = $1, last_name = $2, email = $3 WHERE account_id = $4 RETURNING *';
+  return db.query(sql, [firstName, lastName, email, accountId])
+    .then(result => result.rows[0])
+    .catch(err => {
+      console.error('Error', err);
+      throw new Error('');
+    });
+}
+
+async function getAccountById(accountId) {
+  const sql = 'SELECT * FROM accounts WHERE account_id = $1';
+  return db.query(sql, [accountId])
+    .then(result => result.rows[0])
+    .catch(err => {
+      console.error('Err', err);
+      throw new Error('');
+    });
+}
+
+function updatePassword(accountId, newPassword) {
+  const hashedPassword = bcrypt.hashSync(newPassword, 10); // Cifrar la nueva contraseña
+  const sql = 'UPDATE accounts SET password = $1 WHERE account_id = $2 RETURNING *';
+  return db.query(sql, [hashedPassword, accountId])
+    .then(result => result.rows[0])
+    .catch(err => {
+      console.error('Error', err);
+      throw new Error('');
+    });
+}
+
+module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccountInfo, updatePassword};
 

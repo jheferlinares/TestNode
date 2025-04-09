@@ -106,9 +106,7 @@ async function registerAccount(req, res) {
   }
 }
 
-/* ****************************************
- *  Process login request
- **************************************** */
+
 /* ****************************************
  *  Process login request
  * ************************************ */
@@ -151,5 +149,86 @@ async function accountLogin(req, res) {
   }
 }
 
+/* ****************************************
+ *  Deliver account management view
+ **************************************** */
+const buildManagement = async (req, res, next) => {
+  try {
+    const nav = await utilities.getNav();
+    res.render("account/management", {
+      title: "Account Management",
+      nav,
+    });
+  } catch (error) {
+    next(error); ¿
+  }
+};
 
-module.exports = { buildLogin, buildAccountPage, buildRegister, registerAccount, accountLogin };
+const updateAccount = async (req, res) => {
+  const { firstName, lastName, email, accountId } = req.body;
+
+  const result = await updateAccountInfo(accountId, firstName, lastName, email);
+  
+  if (result.success) {
+    req.flash('success', 'Account updated successfully');
+    res.redirect('/account');
+  } else {
+    req.flash('errors', result.errors);
+    res.redirect('/account/update-account');
+  }
+};
+
+const updatePassword = async (req, res) => {
+  const { password, accountId } = req.body;
+
+  const result = await updatePasswordInfo(accountId, password);
+  
+  if (result.success) {
+    req.flash('success', 'Password changed successfully');
+    res.redirect('/account');
+  } else {
+    req.flash('errors', result.errors);
+    res.redirect('/account/update-account');
+  }
+};
+
+function showAccountUpdateForm(req, res) {
+  const accountId = req.user.account_id; 
+  accountModel.getAccountById(accountId)
+    .then(account => {
+      res.render('account/update-account', { account }); 
+    })
+    .catch(err => {
+      res.status(500).send('Error');
+    });
+}
+
+function updateAccountInfo(req, res) {
+  const { firstName, lastName, email } = req.body;
+  const accountId = req.user.account_id;
+  
+  accountModel.updateAccountInfo(accountId, firstName, lastName, email)
+    .then(updatedAccount => {
+      res.redirect('/account/management'); 
+    })
+    .catch(err => {
+      res.status(500).send('Error');
+    });
+}
+
+function updatePassword(req, res) {
+  const { newPassword } = req.body;
+  const accountId = req.user.account_id;
+
+  accountModel.updatePassword(accountId, newPassword)
+    .then(updatedAccount => {
+      res.redirect('/account/management'); 
+    })
+    .catch(err => {
+      res.status(500).send('Error');
+    });
+}
+
+
+
+module.exports = { buildLogin, buildAccountPage, buildRegister, registerAccount, accountLogin, buildManagement, updateAccount, updatePassword, updateAccountInfo, showAccountUpdateForm }

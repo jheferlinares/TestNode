@@ -1,0 +1,11 @@
+<h1>Account Management</h1>
+
+<% if (locals.accountType === 'Client') { %>
+  <h2>Welcome <%= locals.firstName %></h2>
+  <a href="/account/update">Update Account</a>
+<% } else { %>
+  <h2>Welcome <%= locals.firstName %></h2>
+  <h3>Inventory Management</h3>
+  <p><a href="/inventory">Manage Inventory</a></p>
+  <a href="/account/update">Update Account</a>
+<% } %>
