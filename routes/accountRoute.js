@@ -41,7 +41,6 @@ router.get('/update', (req, res) => {
   });
 });
 
-router.post('/update', checkUpdateData, updateAccount);
 
 router.post('/update-password', updatePassword);
 
