@@ -9,7 +9,7 @@ router.get("/login", utilities.errorHandler(accountController.buildLogin));
 
 router.get("/myAccount", utilities.errorHandler(accountController.buildAccountPage));
 
-router.get("/", utilities.handleErrors(accountController.buildAccountPage));
+router.get("/", utilities.errorHandler(accountController.buildAccountPage));
 
 router.get("/register", utilities.errorHandler(accountController.buildRegister));
 
