@@ -42,12 +42,4 @@ router.get('/update', (req, res) => {
 });
 
 
-router.post('/update-password', updatePassword);
-
-router.get('/update', accountController.showAccountUpdateForm);
-
-router.post('/update', accountController.updateAccountInfo);
-
-router.post('/update-password', accountController.updatePassword);
-
 module.exports = router;
