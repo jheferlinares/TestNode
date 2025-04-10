@@ -18,7 +18,7 @@ router.post(
   invController.addClassification 
 );
 
-router.get("/add-inventory", invController.buildAddInventory); o
+router.get("/add-inventory", invController.buildAddInventory);
 router.post(
   "/add-inventory",
   validate.inventoryRules(), 
@@ -26,13 +26,13 @@ router.post(
   invController.addInventory
 );
 
-router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
+router.get("/getInventory/:classification_id", utilities.errorHandler(invController.getInventoryJSON))
 
-router.get("/edit/:inv_id", invController.editInventoryView, utilities.handleErrors(invController.editInventoryView))
+router.get("/edit/:inv_id", invController.editInventoryView, utilities.errorHandler(invController.editInventoryView))
 
 
 router.post("/update/",
-  validate.newInventoryRules(),
+  validate.inventoryRules(),
   validate.checkUpdateData,
   invController.updateInventory
 )
