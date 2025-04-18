@@ -1,17 +1,24 @@
 <header>
-  <nav>
-    <ul>
+  <div class="header-content">
+    <div class="site-title">
+      <a href="/">CSE Motors</a>
+    </div>
+    <div class="account-nav">
       <% if (locals.loggedIn) { %>
-        <li><a href="/account">Welcome <%= locals.firstName %></a></li>
+        <a href="/account">Welcome <%= locals.firstName %></a>
         <% if (locals.accountType === 'Client') { %>
-          <li><a href="/account/update">Update Account</a></li>
+          <a href="/account/update">Update Account</a>
         <% } else { %>
-          <li><a href="/inventory">Inventory Management</a></li>
+          <a href="/account/update">Update Account</a>
         <% } %>
-        <li><a href="/logout">Logout</a></li>
+        <a href="/account/logout">Logout</a>  <!-- Asegúrate que sea exactamente así -->
       <% } else { %>
-        <li><a href="/login">My Account</a></li>
+        <a href="/account/login">My Account</a>
       <% } %>
-    </ul>
-  </nav>
+    </div>
+  </div>
 </header>
+
+
+
+

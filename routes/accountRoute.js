@@ -34,7 +34,7 @@ router.post(
 
 // Ruta para mostrar el formulario de actualización
 router.get(
-  "/update", // Removido :accountId ya que podemos obtenerlo del token
+  "/update",
   utilities.checkLogin,
   utilities.errorHandler(accountController.buildAccountUpdate)
 );
@@ -52,7 +52,7 @@ router.post(
   utilities.checkLogin,
   regValidate.updateAccountRules(),
   regValidate.checkUpdateData,
-  utilities.errorHandler(accountController.updateAccount)
+  utilities.errorHandler(accountController.updateAccountInfo)  // Cambiado de updateAccount a updateAccountInfo
 );
 
 // Ruta para procesar la actualización de la contraseña
@@ -72,16 +72,23 @@ router.get(
 
 // Ruta para el manejo de errores específicos de la cuenta
 router.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav();
-  console.error(`Error en la ruta de cuenta: ${err.message}`);
-  res.status(err.status || 500).render("account/error", {
-    title: err.status === 404 ? "Página no encontrada" : "Error",
-    message: err.message,
-    nav
-  });
+  try {
+    let nav = await utilities.getNav();
+    console.error(`Error en la ruta de cuenta: ${err.message}`);
+    res.status(err.status || 500).render("account/error", {
+      title: err.status === 404 ? "Página no encontrada" : "Error",
+      message: err.message,
+      nav,
+      errors: null  // Añadido para evitar errores en la vista
+    });
+  } catch (error) {
+    console.error("Error en el manejador de errores:", error);
+    res.status(500).send("Error interno del servidor");
+  }
 });
 
 module.exports = router;
+
 
 
 

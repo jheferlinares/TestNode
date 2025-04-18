@@ -28,7 +28,14 @@
        </ul>
       <% } %>
 
-    <form action="/account/register" method="POST">
+    <form id="registerForm" action="/account/register" method="POST">
+      <label for="account_type">Account Type:</label>
+      <select name="account_type" id="account_type" required>
+        <option value="Client">Client</option>
+        <option value="Employee">Employee</option>
+        <option value="admin">Admin</option>
+      </select>
+
       <label for="account_firstname">First Name:</label>
       <input type="text" id="account_firstname" name="account_firstname" required value="<%= locals.account_firstname %>">
 

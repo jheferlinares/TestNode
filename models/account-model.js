@@ -5,18 +5,29 @@ const bcrypt = require("bcryptjs");
 /* *****************************
  *   Register new account
  ***************************** */
-async function registerAccount(account_firstname, account_lastname, account_email, account_password) {
+/* **********************
+ *   Register new account
+ * ********************* */
+/* **********************
+ *   Register new account
+ * ********************* */
+async function registerAccount(account_firstname, account_lastname, account_email, account_password, account_type) {
   try {
-    const sql = `
-      INSERT INTO account (account_firstname, account_lastname, account_email, account_password, account_type)
-      VALUES ($1, $2, $3, $4, 'Client') 
-      RETURNING *`;
-    return await pool.query(sql, [account_firstname, account_lastname, account_email, account_password]);
+    const sql = 
+      "INSERT INTO account (account_firstname, account_lastname, account_email, account_password, account_type) VALUES ($1, $2, $3, $4, $5::account_type) RETURNING *"
+    return await pool.query(sql, [
+      account_firstname,
+      account_lastname,
+      account_email,
+      account_password,
+      account_type
+    ])
   } catch (error) {
-    console.error("Error registering account:", error);
-    throw error;
+    return error.message
   }
 }
+
+
 
 /* **********************
  *   Check for existing email
@@ -24,10 +35,10 @@ async function registerAccount(account_firstname, account_lastname, account_emai
 async function checkExistingEmail(account_email) {
   try {
     const sql = "SELECT * FROM account WHERE account_email = $1";
-    const email = await pool.query(sql, [account_email]);
-    return email.rowCount;
+    const result = await pool.query(sql, [account_email]);
+    return result.rows[0];
   } catch (error) {
-    console.error("Error checking existing email:", error);
+    console.error("Error in checkExistingEmail:", error);
     throw error;
   }
 }
@@ -55,12 +66,25 @@ async function getAccountByEmail(account_email) {
  ********************** */
 async function getAccountById(account_id) {
   try {
+    // Validar que account_id sea un número válido
+    if (!account_id || isNaN(account_id)) {
+      throw new Error("Invalid account ID");
+    }
+
     const sql = `
       SELECT account_id, account_firstname, account_lastname, 
              account_email, account_type 
       FROM account 
       WHERE account_id = $1`;
-    const result = await pool.query(sql, [account_id]);
+    
+    // Convertir explícitamente a número entero
+    const result = await pool.query(sql, [parseInt(account_id)]);
+    
+    // Verificar si se encontró el registro
+    if (!result.rows[0]) {
+      throw new Error("Account not found");
+    }
+
     return result.rows[0];
   } catch (error) {
     console.error("Error getting account by ID:", error);
@@ -68,25 +92,41 @@ async function getAccountById(account_id) {
   }
 }
 
+
 /* **********************
  *   Update account info
  ********************** */
-async function updateAccountInfo(account_id, account_firstname, account_lastname, account_email) {
+/* **********************
+ *   Update account info
+ ********************** */
+/* **********************
+ *   Update Account
+ * ********************* */
+async function updateAccount(account_id, account_firstname, account_lastname, account_email) {
   try {
     const sql = `
-      UPDATE account 
-      SET account_firstname = $1, 
-          account_lastname = $2, 
-          account_email = $3 
-      WHERE account_id = $4 
+      UPDATE account
+      SET account_firstname = $1,
+          account_lastname = $2,
+          account_email = $3
+      WHERE account_id = $4
       RETURNING *`;
-    const result = await pool.query(sql, [account_firstname, account_lastname, account_email, account_id]);
-    return result.rows[0];
+    
+    const data = await pool.query(sql, [
+      account_firstname,
+      account_lastname,
+      account_email,
+      account_id
+    ]);
+
+    return data.rows[0];
   } catch (error) {
-    console.error("Error updating account:", error);
+    console.error("Error in updateAccount:", error);
     throw error;
   }
 }
+
+
 
 /* **********************
  *   Update password
@@ -112,7 +152,7 @@ module.exports = {
   checkExistingEmail,
   getAccountByEmail,
   getAccountById,
-  updateAccountInfo,
+  updateAccount,
   updatePassword
 };
 

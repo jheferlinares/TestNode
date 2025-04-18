@@ -1,23 +1,18 @@
-<main>
-    <h1><%= title %></h1>
-  
-    <%- messages() %>
-  
-    <% if (locals.loggedIn) { %>
-      <h2>Welcome <%= locals.firstName %></h2>
-      
-      <div class="account-management">
-        <a href="/account/update/<%= locals.accountData.account_id %>" class="update-account-link">
-          Update Account Information
-        </a>
-  
-        <% if (locals.accountType === "Employee" || locals.accountType === "Admin") { %>
-          <h3>Inventory Management</h3>
-          <p><a href="/inv/" class="inventory-link">Manage Inventory</a></p>
-        <% } %>
-      </div>
-    <% } else { %>
-      <p class="notice">Please log in to access account management.</p>
-    <% } %>
-  </main>
-  
+
+<% if (messages) { %>
+  <% if (messages.notice) { %>
+    <div class="notice"><%= messages.notice %></div>
+  <% } %>
+<% } %>
+
+<h1><%= title %></h1>
+
+<div class="inventory-management">
+  <h2>Inventory Controls</h2>
+  <div class="inventory-actions">
+    <a href="/inv/add" class="button">Add New Vehicle</a>
+    <a href="/inv/manage" class="button">Manage Existing Inventory</a>
+  </div>
+</div>
+
+

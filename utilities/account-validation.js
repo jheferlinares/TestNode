@@ -91,10 +91,13 @@ validate.updateAccountRules = () => {
       .withMessage("A valid email is required.")
       .custom(async (account_email, { req }) => {
         const emailExists = await accountModel.checkExistingEmail(account_email);
-        // Permite mantener el mismo email si no se está cambiando
-        if (emailExists && emailExists.account_id !== req.body.account_id) {
+        const account_id = parseInt(req.body.account_id); // Convertir a número
+        
+        // Si el email existe y pertenece a un usuario diferente
+        if (emailExists && emailExists.account_id !== account_id) {
           throw new Error("Email already exists. Please use a different email.");
         }
+        return true; // Email válido
       }),
   ];
 };

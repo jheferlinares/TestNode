@@ -74,3 +74,24 @@ const host = process.env.HOST;
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`);
 });
+
+// Manejo de errores - coloca esto después de todas tus rutas
+app.use(async (err, req, res, next) => {
+  let nav = await utilities.getNav();
+  console.error('Error:', err);
+  
+  if (err.status === 404) {
+    res.status(404).render("errors/error", {
+      title: err.message,
+      message: err.message,
+      nav
+    });
+  } else {
+    res.status(500).render("errors/error", {
+      title: "Server Error",
+      message: err.message,
+      nav
+    });
+  }
+});
+

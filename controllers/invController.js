@@ -305,5 +305,38 @@ invCont.updateInventory = async function (req, res, next) {
   }
 }
 
+/* ***************************
+ *  Build inventory management view for employees/admin
+ * ************************** */
+invCont.buildInventoryManagement = async function (req, res, next) {
+  try {
+    const nav = await utilities.getNav();
+    const classificationSelect = await utilities.buildClassificationList();
 
-module.exports = invCont;
+    // Verificar si el usuario es empleado o administrador
+    if (res.locals.accountData.account_type === "Employee" || 
+        res.locals.accountData.account_type === "Admin") {
+      res.render("./inventory/management", {
+        title: "Vehicle Management",
+        nav,
+        classificationSelect,
+        messages: req.flash(),
+        errors: null,
+        account: res.locals.accountData
+      });
+    } else {
+      req.flash("notice", "Please log in with proper credentials");
+      res.redirect("/account/login");
+    }
+  } catch (error) {
+    console.error("Error building inventory management view:", error);
+    req.flash("notice", "An error occurred");
+    res.status(500).render("500", {
+      title: "Server Error",
+      nav,
+      errors: null
+    });
+  }
+};
+
+module.exports = invCont

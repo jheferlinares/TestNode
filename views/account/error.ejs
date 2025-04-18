@@ -1,0 +1,25 @@
+
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } %>
+
+<% if (message) { %>
+  <p class="notice"><%= message %></p>
+<% } %>
+
+<% if (locals.errors && Array.isArray(locals.errors)) { %>
+  <ul class="notice">
+    <% errors.forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<div class="error-actions">
+  <% if (locals.loggedIn) { %>
+    <a href="/account/" class="button">Volver a mi cuenta</a>
+  <% } else { %>
+    <a href="/" class="button">Volver al inicio</a>
+  <% } %>
+</div>
+

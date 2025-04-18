@@ -90,9 +90,14 @@ utilities.buildClassificationList = async function () {
 /* ************************
  * Error Handler Middleware
  ************************ */
+// En utilities/index.js
 utilities.errorHandler = (callback) => {
   return async (req, res, next) => {
     try {
+      // Verificar que callback sea una función
+      if (typeof callback !== 'function') {
+        throw new Error('Error Handler requires a function as parameter');
+      }
       await callback(req, res, next);
     } catch (err) {
       console.error("Error in errorHandler:", err.message);
@@ -100,6 +105,22 @@ utilities.errorHandler = (callback) => {
     }
   };
 };
+
+
+utilities.handleErrors = async (err, req, res, next) => {
+  let nav = await utilities.getNav();
+  console.error(`Error at: "${req.originalUrl}": ${err.message}`);
+  
+  const status = err.status || 500;
+  const message = err.message || 'Internal Server Error';
+
+  res.status(status).render("account/errors/error", {  // Cambiado para usar tu vista existente
+    title: status,
+    message,
+    nav
+  });
+};
+
 
 /* ****************************************
  * Middleware to check token validity
@@ -160,4 +181,13 @@ utilities.formatPrice = (price) => {
   }).format(price)
 }
 
+utilities.checkEmployeeOrAdmin = (req, res, next) => {
+  if (res.locals.accountData.account_type === "Employee" || 
+      res.locals.accountData.account_type === "Admin") {
+    next()
+  } else {
+    req.flash("notice", "Access Denied. Employees and Admins only.")
+    return res.redirect("/account/")
+  }
+}
 module.exports = utilities;

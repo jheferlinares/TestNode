@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
-  <header>
-    <h1>My Account</h1>
-  </header>
-  <main>
-    <p>You are now logged in.</p>
-    <ul>
-      <li><a href="/account/login">Logout</a></li>
-    </ul>
-  </main>
+<body> 
+    <main>
+        <%- messages() %>
+        
+        <% if (account.account_type === "Employee" || account.account_type === "Admin") { %>
+            <h2>Welcome <%= account.account_firstname %></h2>
+            <h3>Inventory Management</h3>
+            <p><a href="/inv/" title="Manage Inventory">Manage Inventory</a></p>
+        <% } else { %>
+            <h2>Welcome <%= account.account_firstname %></h2>
+        <% } %>
+
+        <p>You are now logged in.</p>
+        <ul>
+            <li><a href="/account/logout">Logout</a></li>
+        </ul>
+    </main>
 </body>
 </html>

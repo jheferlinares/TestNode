@@ -13,6 +13,8 @@ const buildLogin = async (req, res, next) => {
     res.render("account/login", {
       title: "Login",
       nav,
+      errors: null,
+      messages: req.flash(),
     });
   } catch (error) {
     next(error);
@@ -22,18 +24,24 @@ const buildLogin = async (req, res, next) => {
 /* ****************************************
  *  Deliver "My Account" page
  **************************************** */
-const buildAccountPage = async (req, res, next) => {
+/* ****************************************
+*  Deliver login view
+* *************************************** */
+async function buildAccountPage(req, res, next) {
   try {
-    const nav = await utilities.getNav();
+    const nav = await utilities.getNav()
     res.render("account/myAccount", {
-      title: "My Account",
+      title: "Account Management",
       nav,
-      account: res.locals.accountData
-    });
+      account: res.locals.accountData,
+      errors: null,
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
+
+
 
 /* ****************************************
  *  Deliver Registration Page
@@ -68,7 +76,21 @@ const buildPasswordUpdate = async (req, res, next) => {
  **************************************** */
 async function registerAccount(req, res) {
   let nav = await utilities.getNav();
-  const { account_firstname, account_lastname, account_email, account_password } = req.body;
+  const { 
+    account_firstname, 
+    account_lastname, 
+    account_email, 
+    account_password,
+    account_type  // Añadido para capturar el tipo de cuenta
+  } = req.body;
+
+  // Log para depuración
+  console.log("Datos del formulario recibidos:", {
+    account_firstname,
+    account_lastname,
+    account_email,
+    account_type
+  });
 
   try {
     const hashedPassword = await bcrypt.hash(account_password, 10);
@@ -76,55 +98,67 @@ async function registerAccount(req, res) {
       account_firstname,
       account_lastname,
       account_email,
-      hashedPassword
+      hashedPassword,
+      account_type || 'Client' // Valor por defecto si no se especifica
     );
 
     if (regResult) {
       req.flash(
         "notice",
-        `Congratulations, you're registered ${account_firstname}. Please log in.`
+        `Congratulations, you're registered as ${account_type || 'Client'}, ${account_firstname}. Please log in.`
       );
       res.status(201).render("account/login", {
         title: "Login",
         nav,
+        errors: null,
+        messages: req.flash()
       });
     } else {
       req.flash("notice", "Sorry, the registration failed.");
       res.status(501).render("account/register", {
         title: "Registration",
         nav,
+        errors: null,
+        messages: req.flash()
       });
     }
   } catch (error) {
     console.error("Error during registration:", error);
+    req.flash("error", "Registration failed. Please try again.");
     res.status(500).render("account/register", {
       title: "Registration",
       nav,
-      errors: [{ msg: "An unexpected error occurred. Please try again later." }],
+      errors: [{ msg: "Registration failed. Please try again." }],
+      messages: req.flash()
     });
   }
 }
 
+
 /* ****************************************
  *  Process login request
  * ************************************ */
-async function accountLogin(req, res) {
-  let nav = await utilities.getNav();
-  const { account_email, account_password } = req.body;
-  const accountData = await accountModel.getAccountByEmail(account_email);
-  
-  if (!accountData) {
-    req.flash("notice", "Please check your credentials and try again.");
-    res.status(400).render("/login", {
-      title: "Login",
-      nav,
-      errors: null,
-      account_email,
-    });
-    return;
-  }
-  
+/* ****************************************
+ *  Process login request
+ * ************************************ */
+async function accountLogin(req, res, next) { // Añadido next como parámetro
   try {
+    let nav = await utilities.getNav();
+    const { account_email, account_password } = req.body;
+    const accountData = await accountModel.getAccountByEmail(account_email);
+    
+    if (!accountData) {
+      req.flash("notice", "Please check your credentials and try again.");
+      res.status(400).render("account/login", { // Corregido el path de la vista
+        title: "Login",
+        nav,
+        errors: null,
+        messages: req.flash(),
+        account_email,
+      });
+      return;
+    }
+    
     if (await bcrypt.compare(account_password, accountData.account_password)) {
       delete accountData.account_password;
       const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 });
@@ -138,28 +172,44 @@ async function accountLogin(req, res) {
     }
     
     req.flash("notice", "Please check your credentials and try again.");
-    res.status(400).render("/login", {
+    res.status(400).render("account/login", { // Corregido el path de la vista
       title: "Login",
       nav,
       errors: null,
+      messages: req.flash(),
       account_email,
     });
   } catch (error) {
-    next(new Error('Access Forbidden'));
+    next(error); // Pasamos el error actual en lugar de crear uno nuevo
   }
 }
+
 
 /* ****************************************
  *  Account Update Functions
  **************************************** */
+// En controllers/accountController.js
+
 async function buildAccountUpdate(req, res, next) {
   try {
-    const nav = await utilities.getNav();
-    const accountId = res.locals.accountData.account_id;
-    const accountData = await accountModel.getAccountById(accountId);
+    let nav = await utilities.getNav();
     
+    // Obtener el account_id del token JWT almacenado en res.locals
+    const account_id = res.locals.accountData.account_id;
+    
+    // Verificar que account_id sea válido
+    if (!account_id) {
+      throw new Error("Invalid account ID");
+    }
+
+    const accountData = await accountModel.getAccountById(account_id);
+    
+    if (!accountData) {
+      throw new Error("Account not found");
+    }
+
     res.render("account/update", {
-      title: "Update Account",
+      title: "Edit Account Information",
       nav,
       errors: null,
       account_firstname: accountData.account_firstname,
@@ -172,27 +222,52 @@ async function buildAccountUpdate(req, res, next) {
   }
 }
 
-async function updateAccount(req, res, next) {
+
+
+async function updateAccountInfo(req, res, next) {
   try {
-    const { account_firstname, account_lastname, account_email, account_id } = req.body;
-    const result = await accountModel.updateAccount({
+    let nav = await utilities.getNav();
+    const { 
+      account_firstname, 
+      account_lastname, 
+      account_email,
+      account_id 
+    } = req.body;
+
+    // Validar que account_id sea un número
+    const parsedId = parseInt(account_id);
+    if (isNaN(parsedId)) {
+      throw new Error("Invalid account ID");
+    }
+
+    const result = await accountModel.updateAccount(
+      parsedId,
       account_firstname,
       account_lastname,
-      account_email,
-      account_id
-    });
+      account_email
+    );
 
     if (result) {
-      req.flash("success", "Account updated successfully");
+      req.flash("success", `Congratulations, ${account_firstname}! Your account was successfully updated.`);
       res.redirect("/account/");
     } else {
       req.flash("notice", "Error updating account");
-      res.redirect("/account/update");
+      res.status(501).render("account/update", {
+        title: "Edit Account",
+        nav,
+        errors: null,
+        account_firstname,
+        account_lastname,
+        account_email,
+        account_id
+      });
     }
   } catch (error) {
     next(error);
   }
 }
+
+
 
 async function updatePassword(req, res, next) {
   try {
@@ -212,6 +287,28 @@ async function updatePassword(req, res, next) {
   }
 }
 
+async function logoutAccount(req, res, next) {
+  try {
+    res.clearCookie("jwt");
+    res.clearCookie("connect.sid");
+    await new Promise((resolve, reject) => {
+      req.session.destroy((error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    });
+    
+    return res.redirect("/");  // Cambia esto para redirigir directamente
+  } catch (error) {
+    req.flash("notice", "Error during logout");
+    return res.redirect("/");  // En caso de error, también redirige a home
+  }
+}
+
+
 module.exports = {
   buildLogin,
   buildAccountPage,
@@ -219,7 +316,8 @@ module.exports = {
   registerAccount,
   accountLogin,
   buildAccountUpdate,
-  updateAccount,
+  updateAccountInfo,
   updatePassword,
   buildPasswordUpdate,
+  logoutAccount,
 };
