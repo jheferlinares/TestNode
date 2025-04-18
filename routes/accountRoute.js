@@ -1,18 +1,22 @@
-// Importar módulos necesarios
 const express = require("express");
 const router = express.Router();
-const accountController = require("../controllers/accountController"); // Controlador de cuentas
-const utilities = require("../utilities/index"); // Utilidades
-const regValidate = require("../utilities/account-validation"); // Validaciones
+const accountController = require("../controllers/accountController");
+const utilities = require("../utilities/");
+const regValidate = require("../utilities/account-validation");
 
+// Ruta para mostrar la página de login
 router.get("/login", utilities.errorHandler(accountController.buildLogin));
 
-router.get("/myAccount", utilities.errorHandler(accountController.buildAccountPage));
+// Ruta para mostrar la página de gestión de cuenta
+router.get("/", 
+  utilities.checkLogin, 
+  utilities.errorHandler(accountController.buildAccountPage)
+);
 
-router.get("/", utilities.errorHandler(accountController.buildAccountPage));
-
+// Ruta para mostrar la página de registro
 router.get("/register", utilities.errorHandler(accountController.buildRegister));
 
+// Ruta para procesar el registro
 router.post(
   "/register",
   regValidate.registationRules(),
@@ -20,6 +24,7 @@ router.post(
   utilities.errorHandler(accountController.registerAccount)
 );
 
+// Ruta para procesar el login
 router.post(
   "/login",
   regValidate.loginRules(),
@@ -27,19 +32,56 @@ router.post(
   utilities.errorHandler(accountController.accountLogin)
 );
 
-router.post("/login", (req, res) => {
-  res.status(200).send('login process');
-});
+// Ruta para mostrar el formulario de actualización
+router.get(
+  "/update", // Removido :accountId ya que podemos obtenerlo del token
+  utilities.checkLogin,
+  utilities.errorHandler(accountController.buildAccountUpdate)
+);
 
-router.get('/update', (req, res) => {
-  res.render('account/update-account', {
-    firstName: req.user.firstName,
-    lastName: req.user.lastName,
-    email: req.user.email,
-    accountId: req.user.accountId,
-    errors: req.flash('errors'),
+// Ruta para mostrar el formulario de actualización de contraseña
+router.get(
+  "/update/password",
+  utilities.checkLogin,
+  utilities.errorHandler(accountController.buildPasswordUpdate)
+);
+
+// Ruta para procesar la actualización de la cuenta
+router.post(
+  "/update",
+  utilities.checkLogin,
+  regValidate.updateAccountRules(),
+  regValidate.checkUpdateData,
+  utilities.errorHandler(accountController.updateAccount)
+);
+
+// Ruta para procesar la actualización de la contraseña
+router.post(
+  "/update/password",
+  utilities.checkLogin,
+  regValidate.updatePasswordRules(),
+  regValidate.checkPasswordData,
+  utilities.errorHandler(accountController.updatePassword)
+);
+
+// Ruta para procesar el logout
+router.get(
+  "/logout", 
+  utilities.errorHandler(accountController.logoutAccount)
+);
+
+// Ruta para el manejo de errores específicos de la cuenta
+router.use(async (err, req, res, next) => {
+  let nav = await utilities.getNav();
+  console.error(`Error en la ruta de cuenta: ${err.message}`);
+  res.status(err.status || 500).render("account/error", {
+    title: err.status === 404 ? "Página no encontrada" : "Error",
+    message: err.message,
+    nav
   });
 });
 
-
 module.exports = router;
+
+
+

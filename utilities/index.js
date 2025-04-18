@@ -1,7 +1,6 @@
 const { Pool } = require("pg");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const Util = {}
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -11,14 +10,14 @@ const pool = new Pool({
 });
 
 const invModel = require("../models/inventory-model");
-const utilities = {}; // Inicializa el objeto utilities
+const utilities = {};
 
 /* ************************
  * Constructs the nav HTML unordered list
  ************************ */
 utilities.getNav = async function () {
   try {
-    const data = await invModel.getClassifications(); // Obtiene las clasificaciones desde la base de datos
+    const data = await invModel.getClassifications();
     let list = "<ul>";
     list += '<li><a href="/" title="Home page">Home</a></li>';
     data.rows.forEach((row) => {
@@ -27,10 +26,10 @@ utilities.getNav = async function () {
       list += "</li>";
     });
     list += "</ul>";
-    return list; // Devuelve el HTML generado
+    return list;
   } catch (error) {
-    console.error("Error in getNav:", error.message); // Log para depuración
-    throw error; // Lanza el error para que sea manejado por el controlador
+    console.error("Error in getNav:", error.message);
+    throw error;
   }
 };
 
@@ -62,10 +61,10 @@ utilities.buildClassificationGrid = async function (data) {
     } else {
       grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>';
     }
-    return grid; // Devuelve el HTML generado
+    return grid;
   } catch (error) {
-    console.error("Error in buildClassificationGrid:", error.message); // Log para depuración
-    throw error; // Lanza el error para que sea manejado por el controlador
+    console.error("Error in buildClassificationGrid:", error.message);
+    throw error;
   }
 };
 
@@ -74,17 +73,17 @@ utilities.buildClassificationGrid = async function (data) {
  ************************************** */
 utilities.buildClassificationList = async function () {
   try {
-    const data = await invModel.getClassifications(); // Obtén las clasificaciones desde la base de datos
+    const data = await invModel.getClassifications();
     let classificationList = '<select name="classification_id" id="classificationList" required>';
     classificationList += "<option value=''>Choose a Classification</option>";
     data.rows.forEach((row) => {
       classificationList += `<option value="${row.classification_id}">${row.classification_name}</option>`;
     });
     classificationList += "</select>";
-    return classificationList; // Devuelve el HTML generado
+    return classificationList;
   } catch (error) {
-    console.error("Error building classification list:", error.message); // Log para depuración
-    throw error; // Lanza el error para que sea manejado por el controlador
+    console.error("Error building classification list:", error.message);
+    throw error;
   }
 };
 
@@ -94,10 +93,10 @@ utilities.buildClassificationList = async function () {
 utilities.errorHandler = (callback) => {
   return async (req, res, next) => {
     try {
-      await callback(req, res, next); // Ejecuta la función callback
+      await callback(req, res, next);
     } catch (err) {
-      console.error("Error in errorHandler:", err.message); // Log para depuración
-      next(err); // Pasa el error al middleware de manejo de errores
+      console.error("Error in errorHandler:", err.message);
+      next(err);
     }
   };
 };
@@ -105,39 +104,60 @@ utilities.errorHandler = (callback) => {
 /* ****************************************
  * Middleware to check token validity
  **************************************** */
-/* ****************************************
-* Middleware to check token validity
-**************************************** */
 utilities.checkJWTToken = (req, res, next) => {
   if (req.cookies.jwt) {
-   jwt.verify(
-    req.cookies.jwt,
-    process.env.ACCESS_TOKEN_SECRET,
-    function (err, accountData) {
-     if (err) {
-      req.flash("Please log in")
-      res.clearCookie("jwt")
-      return res.redirect("/account/login")
-     }
-     res.locals.accountData = accountData
-     res.locals.loggedin = 1
-     next()
-    })
+    jwt.verify(
+      req.cookies.jwt,
+      process.env.ACCESS_TOKEN_SECRET,
+      function (err, accountData) {
+        if (err) {
+          req.flash("notice", "Please log in")
+          res.clearCookie("jwt")
+          return res.redirect("/account/login")
+        }
+        res.locals.accountData = accountData
+        res.locals.loggedIn = 1
+        res.locals.firstName = accountData.account_firstname
+        res.locals.accountType = accountData.account_type
+        next()
+      })
   } else {
-   next()
+    next()
   }
- }
+}
 
- /* ****************************************
- *  Check Login
- * ************************************ */
- Util.checkLogin = (req, res, next) => {
-  if (res.locals.loggedin) {
+/* ****************************************
+ * Check Login
+ **************************************** */
+utilities.checkLogin = (req, res, next) => {
+  if (res.locals.loggedIn) {
     next()
   } else {
     req.flash("notice", "Please log in.")
+    return res.redirect("/login")
+  }
+}
+
+/* ****************************************
+ * Check Account Type
+ **************************************** */
+utilities.checkAccountType = (req, res, next) => {
+  if (res.locals.accountType === "Employee" || res.locals.accountType === "Admin") {
+    next()
+  } else {
+    req.flash("notice", "Unauthorized access")
     return res.redirect("/account/login")
   }
- }
+}
 
-module.exports = utilities, Util; // Exporta el objeto utilities
+/* ****************************************
+ * Unit Price Formatter
+ **************************************** */
+utilities.formatPrice = (price) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  }).format(price)
+}
+
+module.exports = utilities;

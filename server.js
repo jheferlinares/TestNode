@@ -54,7 +54,9 @@ app.use(staticRoute);
 app.get("/", require("./controllers/baseController").buildHome);
 app.use("/inv", inventoryRoute); 
 app.use("/account", accountRoute);
-
+app.get("/login", (req, res) => {
+  res.redirect("/account/login");
+});
 // Middleware for 404 errors
 app.use((req, res, next) => {
   const error = new Error("Page Not Found");

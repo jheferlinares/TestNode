@@ -1,5 +1,6 @@
 // Importa la conexión a la base de datos
-const pool = require("../database"); // Asegúrate de que la ruta sea correcta
+const pool = require("../database");
+const bcrypt = require("bcryptjs");
 
 /* *****************************
  *   Register new account
@@ -8,7 +9,8 @@ async function registerAccount(account_firstname, account_lastname, account_emai
   try {
     const sql = `
       INSERT INTO account (account_firstname, account_lastname, account_email, account_password, account_type)
-      VALUES ($1, $2, $3, $4, 'Client') RETURNING *`;
+      VALUES ($1, $2, $3, $4, 'Client') 
+      RETURNING *`;
     return await pool.query(sql, [account_firstname, account_lastname, account_email, account_password]);
   } catch (error) {
     console.error("Error registering account:", error);
@@ -30,49 +32,88 @@ async function checkExistingEmail(account_email) {
   }
 }
 
-
-async function getAccountByEmail (account_email) {
+/* **********************
+ *   Get account by email
+ ********************** */
+async function getAccountByEmail(account_email) {
   try {
-    const result = await pool.query(
-      'SELECT account_id, account_firstname, account_lastname, account_email, account_type, account_password FROM account WHERE account_email = $1',
-      [account_email])
-    return result.rows[0]
+    const sql = `
+      SELECT account_id, account_firstname, account_lastname, 
+             account_email, account_type, account_password 
+      FROM account 
+      WHERE account_email = $1`;
+    const result = await pool.query(sql, [account_email]);
+    return result.rows[0];
   } catch (error) {
-    return new Error("No matching email found")
+    console.error("Error getting account by email:", error);
+    throw new Error("No matching email found");
   }
 }
 
-
-async function updateAccountInfo(accountId, firstName, lastName, email) {
-  const sql = 'UPDATE accounts SET first_name = $1, last_name = $2, email = $3 WHERE account_id = $4 RETURNING *';
-  return db.query(sql, [firstName, lastName, email, accountId])
-    .then(result => result.rows[0])
-    .catch(err => {
-      console.error('Error', err);
-      throw new Error('');
-    });
+/* **********************
+ *   Get account by ID
+ ********************** */
+async function getAccountById(account_id) {
+  try {
+    const sql = `
+      SELECT account_id, account_firstname, account_lastname, 
+             account_email, account_type 
+      FROM account 
+      WHERE account_id = $1`;
+    const result = await pool.query(sql, [account_id]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error getting account by ID:", error);
+    throw error;
+  }
 }
 
-async function getAccountById(accountId) {
-  const sql = 'SELECT * FROM accounts WHERE account_id = $1';
-  return db.query(sql, [accountId])
-    .then(result => result.rows[0])
-    .catch(err => {
-      console.error('Err', err);
-      throw new Error('');
-    });
+/* **********************
+ *   Update account info
+ ********************** */
+async function updateAccountInfo(account_id, account_firstname, account_lastname, account_email) {
+  try {
+    const sql = `
+      UPDATE account 
+      SET account_firstname = $1, 
+          account_lastname = $2, 
+          account_email = $3 
+      WHERE account_id = $4 
+      RETURNING *`;
+    const result = await pool.query(sql, [account_firstname, account_lastname, account_email, account_id]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error updating account:", error);
+    throw error;
+  }
 }
 
-function updatePassword(accountId, newPassword) {
-  const hashedPassword = bcrypt.hashSync(newPassword, 10); // Cifrar la nueva contraseña
-  const sql = 'UPDATE accounts SET password = $1 WHERE account_id = $2 RETURNING *';
-  return db.query(sql, [hashedPassword, accountId])
-    .then(result => result.rows[0])
-    .catch(err => {
-      console.error('Error', err);
-      throw new Error('');
-    });
+/* **********************
+ *   Update password
+ ********************** */
+async function updatePassword(account_id, account_password) {
+  try {
+    const hashedPassword = await bcrypt.hashSync(account_password, 10);
+    const sql = `
+      UPDATE account 
+      SET account_password = $1 
+      WHERE account_id = $2 
+      RETURNING *`;
+    const result = await pool.query(sql, [hashedPassword, account_id]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
 }
 
-module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccountInfo, updatePassword};
+module.exports = {
+  registerAccount,
+  checkExistingEmail,
+  getAccountByEmail,
+  getAccountById,
+  updateAccountInfo,
+  updatePassword
+};
+
 
