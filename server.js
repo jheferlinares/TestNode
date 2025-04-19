@@ -12,6 +12,7 @@ const utilities = require("./utilities/index");
 const bodyParser = require("body-parser");
 const app = express();
 const baseController = require("./controllers/baseController");
+const compareRoute = require("./routes/compareRoute");
 
 // Middleware for sessions
 app.use(
@@ -49,33 +50,27 @@ app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "./layouts/layout");
 
-// Routes
+// Routes - TODAS las rutas deben ir ANTES de los manejadores de error
 app.use(staticRoute);
 app.get("/", require("./controllers/baseController").buildHome);
 app.use("/inv", inventoryRoute); 
 app.use("/account", accountRoute);
+app.use("/compare", compareRoute); // Movida aquí, antes de los manejadores de error
 app.get("/login", (req, res) => {
   res.redirect("/account/login");
 });
-// Middleware for 404 errors
+
+// Middleware para 404 - DESPUÉS de todas las rutas
 app.use((req, res, next) => {
   const error = new Error("Page Not Found");
   error.status = 404;
   next(error);
 });
 
-// Error-handling middleware
+// Error-handling middleware - SIEMPRE al final
 app.use(errorHandler);
 
-// Server information
-const port = process.env.PORT;
-const host = process.env.HOST;
-
-app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`);
-});
-
-// Manejo de errores - coloca esto después de todas tus rutas
+// Manejo de errores general
 app.use(async (err, req, res, next) => {
   let nav = await utilities.getNav();
   console.error('Error:', err);
@@ -95,3 +90,10 @@ app.use(async (err, req, res, next) => {
   }
 });
 
+// Server information
+const port = process.env.PORT;
+const host = process.env.HOST;
+
+app.listen(port, () => {
+  console.log(`app listening on ${host}:${port}`);
+});

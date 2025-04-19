@@ -1,0 +1,78 @@
+
+<main>
+  <h1><%= title %></h1>
+
+  <% if (messages) { %>
+    <%- messages() %>
+  <% } %>
+
+  <div class="comparison-results">
+    <table class="comparison-table">
+      <tr>
+        <th>Features</th>
+        <th>
+          <img src="<%= vehicle1.inv_thumbnail %>" 
+               alt="<%= vehicle1.inv_make %> <%= vehicle1.inv_model %>"
+               class="comparison-thumbnail">
+          <%= vehicle1.inv_make %> <%= vehicle1.inv_model %>
+        </th>
+        <th>
+          <img src="<%= vehicle2.inv_thumbnail %>" 
+               alt="<%= vehicle2.inv_make %> <%= vehicle2.inv_model %>"
+               class="comparison-thumbnail">
+          <%= vehicle2.inv_make %> <%= vehicle2.inv_model %>
+        </th>
+      </tr>
+      <tr>
+        <td>Make</td>
+        <td><%= vehicle1.inv_make %></td>
+        <td><%= vehicle2.inv_make %></td>
+      </tr>
+      <tr>
+        <td>Model</td>
+        <td><%= vehicle1.inv_model %></td>
+        <td><%= vehicle2.inv_model %></td>
+      </tr>
+      <tr>
+        <td>Year</td>
+        <td><%= vehicle1.inv_year %></td>
+        <td><%= vehicle2.inv_year %></td>
+      </tr>
+      <tr>
+        <td>Price</td>
+        <td>$<%= new Intl.NumberFormat().format(vehicle1.inv_price) %></td>
+        <td>$<%= new Intl.NumberFormat().format(vehicle2.inv_price) %></td>
+      </tr>
+      <tr>
+        <td>Miles</td>
+        <td><%= new Intl.NumberFormat().format(vehicle1.inv_miles) %></td>
+        <td><%= new Intl.NumberFormat().format(vehicle2.inv_miles) %></td>
+      </tr>
+      <tr>
+        <td>Color</td>
+        <td><%= vehicle1.inv_color %></td>
+        <td><%= vehicle2.inv_color %></td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td><%= vehicle1.inv_description %></td>
+        <td><%= vehicle2.inv_description %></td>
+      </tr>
+      <tr>
+        <td>Full Image</td>
+        <td>
+          <img src="<%= vehicle1.inv_image %>" 
+               alt="<%= vehicle1.inv_make %> <%= vehicle1.inv_model %>"
+               class="comparison-full-image">
+        </td>
+        <td>
+          <img src="<%= vehicle2.inv_image %>" 
+               alt="<%= vehicle2.inv_make %> <%= vehicle2.inv_model %>"
+               class="comparison-full-image">
+        </td>
+      </tr>
+    </table>
+  </div>
+</main>
+
+

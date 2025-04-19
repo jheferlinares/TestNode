@@ -25,6 +25,8 @@ utilities.getNav = async function () {
       list += `<a href="/inv/type/${row.classification_id}" title="See our inventory of ${row.classification_name} vehicles">${row.classification_name}</a>`;
       list += "</li>";
     });
+    // Agregar Compare al final de todo
+    list += '<li><a href="/compare" title="Compare Vehicles">Compare</a></li>';
     list += "</ul>";
     return list;
   } catch (error) {
@@ -32,6 +34,8 @@ utilities.getNav = async function () {
     throw error;
   }
 };
+
+
 
 /* **************************************
  * Build the classification view HTML
@@ -190,4 +194,64 @@ utilities.checkEmployeeOrAdmin = (req, res, next) => {
     return res.redirect("/account/")
   }
 }
+
+/* ****************************************
+ * Build Vehicle Comparison Grid
+ **************************************** */
+utilities.buildComparisonGrid = function(vehicle1, vehicle2) {
+  try {
+    let grid = '<div class="comparison-grid">';
+    grid += '<table>';
+    grid += '<tr><th>Features</th>';
+    grid += `<th>${vehicle1.inv_make} ${vehicle1.inv_model}</th>`;
+    grid += `<th>${vehicle2.inv_make} ${vehicle2.inv_model}</th></tr>`;
+    
+    // Año
+    grid += '<tr><td>Year</td>';
+    grid += `<td>${vehicle1.inv_year}</td>`;
+    grid += `<td>${vehicle2.inv_year}</td></tr>`;
+    
+    // Precio
+    grid += '<tr><td>Price</td>';
+    grid += `<td>${utilities.formatPrice(vehicle1.inv_price)}</td>`;
+    grid += `<td>${utilities.formatPrice(vehicle2.inv_price)}</td></tr>`;
+    
+    // Millas
+    grid += '<tr><td>Miles</td>';
+    grid += `<td>${new Intl.NumberFormat().format(vehicle1.inv_miles)}</td>`;
+    grid += `<td>${new Intl.NumberFormat().format(vehicle2.inv_miles)}</td></tr>`;
+    
+    // Color
+    grid += '<tr><td>Color</td>';
+    grid += `<td>${vehicle1.inv_color}</td>`;
+    grid += `<td>${vehicle2.inv_color}</td></tr>`;
+    
+    grid += '</table></div>';
+    return grid;
+  } catch (error) {
+    console.error("Error in buildComparisonGrid:", error.message);
+    throw error;
+  }
+};
+
+utilities.getNav = async function () {
+  try {
+    const data = await invModel.getClassifications();
+    let list = "<ul>";
+    list += '<li><a href="/" title="Home page">Home</a></li>';
+    // Agregar el nuevo enlace de comparación
+    list += '<li><a href="/compare" title="Compare Vehicles">Compare Vehicles</a></li>';
+    data.rows.forEach((row) => {
+      list += "<li>";
+      list += `<a href="/inv/type/${row.classification_id}" title="See our inventory of ${row.classification_name} vehicles">${row.classification_name}</a>`;
+      list += "</li>";
+    });
+    list += "</ul>";
+    return list;
+  } catch (error) {
+    console.error("Error in getNav:", error.message);
+    throw error;
+  }
+};
+
 module.exports = utilities;

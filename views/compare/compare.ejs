@@ -1,0 +1,38 @@
+<main>
+  <h1><%= title %></h1>
+
+  <% if (messages) { %>
+    <%- messages() %>
+  <% } %>
+
+  <div class="compare-form">
+    <form action="/compare/results" method="GET">
+      <div class="form-group">
+        <label for="vehicle1">Select First Vehicle:</label>
+        <select name="vehicle1_id" id="vehicle1" required>
+          <option value="">Choose a vehicle</option>
+          <% vehicles.forEach(vehicle => { %>
+            <option value="<%= vehicle.inv_id %>">
+              <%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="vehicle2">Select Second Vehicle:</label>
+        <select name="vehicle2_id" id="vehicle2" required>
+          <option value="">Choose a vehicle</option>
+          <% vehicles.forEach(vehicle => { %>
+            <option value="<%= vehicle.inv_id %>">
+              <%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <button type="submit">Compare Vehicles</button>
+    </form>
+  </div>
+</main>
+
